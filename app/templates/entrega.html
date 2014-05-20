@@ -1,0 +1,73 @@
+
+<html>
+<head>
+  <title></title>
+  <link type="text/css" rel="stylesheet" href="/static/css/base.css" />
+  <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.css" />
+
+</head>
+<style type="text/css">
+.cont-1{
+  width: 90%;
+  padding: 20px;
+  height: 100%;
+  background-color: white;
+  margin-left: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-size: 16px;
+}
+</style>
+<body>
+  <div class="cont-1">
+    <br>
+
+    {% for d in d|slice:":2" %} 
+   
+    <div class="alert alert-success">
+    
+    Boletos: {{d.Boletos}} <br>
+    Fecha: {{d.Fecha}}  <br>
+    
+    </div>
+    {% endfor %}
+
+    {% autoescape off %}
+
+
+    {{html}}
+
+    {% endautoescape %}
+<form method="post" action=".">{% csrf_token %}
+  
+
+  {{formulario.Usuario}}
+<br>
+  Desde 
+  <br>
+  <div class="input-append">
+  
+ {{formulario.Desde}}
+  <span class="add-on"> # </span>
+</div>
+<br>
+Hasta
+<br>
+<div class="input-append">
+ {{formulario.Hasta}}
+  <span class="add-on"> # </span>
+</div>
+
+
+
+<br>
+<input type="submit" class="btn btn-primary" value="Enviar" > <a href="/salir/" target="_blank">
+  <button class="btn ">Cancelar</button>
+  </a>
+
+</form>
+
+
+</div>
+</body>
+</html>
