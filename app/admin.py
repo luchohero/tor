@@ -35,7 +35,7 @@ class Cuenta_Admin(admin.ModelAdmin):
 
 class Boleto_Admin(admin.ModelAdmin):
 
-	list_display = 'Numero','Fecha','Socio','Funcionario','Fecha_e','Fecha_e_s','Entrega','Motivo'
+	list_display = 'Numero','Fecha','Socio','Funcionario','Fecha_e','Fecha_e_s','Entrega','Motivo','Baja','Transferible','Agencia'
 	list_filter = 'Funcionario',
 	search_fields = ['Numero',]
 
@@ -50,9 +50,24 @@ class Historial_Admin(admin.ModelAdmin):
 	search_fields = 'Cuenta','Monto','Boletos','Fecha'
 	
 
+class Agencia_Admin(admin.ModelAdmin):
+    list_display = 'Cod','Agencia'
+    list_filter = 'Cod','Agencia'
+    search_fields = 'Cod','Agencia'
+
+class Funcionario_Admin(admin.ModelAdmin):
+    list_display = 'Cod','Nombres','Users','Agencia'
+    list_filter = 'Cod','Nombres','Users','Agencia'
+    search_fields = 'Cod','Nombres','Users','Agencia'   
+
+
+
+
 admin.site.register(Cuenta, Cuenta_Admin)
 admin.site.register(Boleto, Boleto_Admin)
 admin.site.register(Motivo, Motivo_Admin)
+admin.site.register(Agencia, Agencia_Admin)
+admin.site.register(Funcionario, Funcionario_Admin)
 admin.site.register(Historial, Historial_Admin)
 
 

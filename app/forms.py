@@ -1,11 +1,12 @@
 from django import forms
 from django.contrib.auth.models import User
 from app.models import *
-
+Plazo = ((True,'Si'),(False,'No'),)
 class Entregaform(forms.Form):
-    Usuario = forms.ModelChoiceField(queryset=User.objects.all())
-    Desde = forms.IntegerField(max_value=800000,min_value=1)
-    Hasta = forms.IntegerField(max_value=800000,min_value=1)
+    Usuario = forms.ModelChoiceField(queryset=Funcionario.objects.all())
+    Desde = forms.IntegerField(max_value=800000,min_value=1,required=True)
+    Hasta = forms.IntegerField(max_value=800000,min_value=1,required=True)
+    Transferible = forms.ChoiceField(required=False,choices=Plazo)
 
 
 class Entregaformsocio(forms.Form):

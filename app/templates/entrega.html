@@ -3,7 +3,7 @@
 <head>
   <title></title>
   <link type="text/css" rel="stylesheet" href="/static/css/base.css" />
-  <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.css" />
+  <link type="text/css" rel="stylesheet" href="/static/bootstrap/css/bootstrap.css" />
 
 </head>
 <style type="text/css">
@@ -22,15 +22,6 @@
   <div class="cont-1">
     <br>
 
-    {% for d in d|slice:":2" %} 
-   
-    <div class="alert alert-success">
-    
-    Boletos: {{d.Boletos}} <br>
-    Fecha: {{d.Fecha}}  <br>
-    
-    </div>
-    {% endfor %}
 
     {% autoescape off %}
 
@@ -57,6 +48,7 @@ Hasta
  {{formulario.Hasta}}
   <span class="add-on"> # </span>
 </div>
+Transferible {{formulario.Transferible}}
 
 
 

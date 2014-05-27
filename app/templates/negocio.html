@@ -27,7 +27,11 @@
 <form method="post" action=".">{% csrf_token %}
   
 {{texto}}
-  {{formulario}}
+  Número de Boletos <br>
+  {{formulario.boletos}} <br> Razon 
+ <br>   {{formulario.razon}}
+
+
 <br>
 <input type="submit" class="btn btn-primary" value="Enviar" >
 <a href="/salir/" target="_blank">

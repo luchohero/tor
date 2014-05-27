@@ -18,12 +18,9 @@ import xlwt
 @login_required(login_url='/login/')
 def Home(request):
 	usuario = request.user
-	boleto = Boleto.objects.all().filter(Funcionario=usuario,Entrega=False)
-	boleto1 = Boleto.objects.all().filter(Funcionario=usuario,Entrega=True)
-	a=len(boleto)
-	a1=len(boleto1)
+
 	
-	return render_to_response('inicio.html',{'usuario':usuario,'a':a,'a1':a1},
+	return render_to_response('inicio.html',{'usuario':usuario},
 		context_instance=RequestContext(request))
 
 def Ingresar(request):
@@ -58,24 +55,26 @@ def Entrega(request):
 		#if not request.POST['Desde'] or request.POST['Hasta']:
 		#	return HttpResponseRedirect('/entrega/')
 		formulario_post = Entregaform(request.POST)
+
 		if formulario_post.is_valid:
 
 			u = request.POST['Desde']
 			Desde = int(u)
 			u1 = request.POST['Hasta']
 			Hasta = int(u1)
-		
-			usuario = User.objects.get(id=request.POST['Usuario'])
+			print request.POST['Usuario']
+			usuario = Funcionario.objects.get(Cod=request.POST['Usuario'])
 			for q in range(Desde,Hasta+1):
 			
 			#log entrega al usuario
 			#print Boleto.objects.all().get(Numero=q)
 				if len(Boleto.objects.all().filter(Numero=q)) == 0:
-				
-
-				
+					print request.POST['Transferible']
+					
 					ing = Boleto.objects.create(
-						Numero=q,Funcionario=usuario,Fecha_e=datetime.date.today(),Entrega=False)
+							Numero=q,Funcionario=usuario,Fecha_e=datetime.date.today(),Entrega=False,Transferible=request.POST['Transferible'])
+					
+				
 				else:
 					Valores = '%s | %s |' %(Valores,q)
 			if 	Valores != 'Valores: ':
@@ -127,9 +126,12 @@ def EntregaSocio(request):
 		return render_to_response('entrega1.html',{'formulario':formulario}, 
 		context_instance=RequestContext(request))
 				
-def EntregaSocio1(request,cuenta):
+def EntregaSocio1(request,cuenta,usuario):
 	if Cuenta.objects.all().filter(Numero=cuenta):
+
 		if request.method == 'POST':
+			
+			
 			c = Cuenta.objects.get(Numero=cuenta)
 			############ no basio #################
 			if len(request.POST['Razon'])== 0:
@@ -151,8 +153,9 @@ def EntregaSocio1(request,cuenta):
 				f = b1 / e.Ciclo
 				socio = c.id
 				###>>>>>>> historial
+				
 				l = Historial.objects.create(Cuenta=c,Monto=0,Boletos=1)
-				cadena = '/entrega-boletos/%s/1/%s' %(socio,razon)
+				cadena = '/entrega-boletos/%s/1/%s/%s' %(socio,razon,usuario)
 				return HttpResponseRedirect(cadena)
 			else:
 				razon = request.POST['Razon']
@@ -163,11 +166,12 @@ def EntregaSocio1(request,cuenta):
 				f = b1 / e.Ciclo
 				socio = c.id
 				###>>>>>>> historial
+				
 				l = Historial.objects.create(Cuenta=c,Monto=0,Boletos=f)
-				cadena = '/entrega-boletos/%s/%s/%s' %(socio,f,razon)
+				cadena = '/entrega-boletos/%s/%s/%s/%s' %(socio,f,razon,usuario)
 				return HttpResponseRedirect(cadena)
 
-	
+
 	formulario = Entregaformsocio()
 	return render_to_response('entrega1.html',{'formulario':formulario}, 
 	context_instance=RequestContext(request))
@@ -242,7 +246,7 @@ def EntregaSocio3(request,s,b):
 
 ################ Boletos #######################
 
-def EntregaBoletos(request,s,b,m):
+def EntregaBoletos(request,s,b,m,usuario):
 
 	if Cuenta.objects.all().filter(Numero=s):
 		pass	
@@ -266,8 +270,8 @@ def EntregaBoletos(request,s,b,m):
 			#### dos filtros previos #### 
 			# 1 si el usuario tiene permiso sobre los numeros
 			# 2 si el boleto no esta marcado aun
-			
-			
+		
+		g = Funcionario.objects.get(Cod=usuario)
 
 		if m1.Repetitivo == False:
 				#si el boleto no es del usuario
@@ -282,6 +286,7 @@ def EntregaBoletos(request,s,b,m):
 				ing.Motivo = m1
 				ing.Fecha_e_s = datetime.date.today()
 				ing.Entrega = True
+				ing.Funcionario = g
 				ing.save()
 				
 				return HttpResponseRedirect('/salir/')
@@ -306,6 +311,7 @@ def EntregaBoletos(request,s,b,m):
 				ing.Motivo = m1
 				ing.Fecha_e_s = datetime.date.today()
 				ing.Entrega = True
+				ing.Funcionario = g
 				ing.save()
 				v += 1
 			else:
@@ -317,12 +323,12 @@ def EntregaBoletos(request,s,b,m):
 
 		
 		if valor == 0: 
-			return HttpResponse('hola')
+			return HttpResponseRedirect('/salir/')
 			
 		else:
 
 			formulario = Boletosform()
-			cadena = '/entrega-boletos/%s/%s/%s' %(s,valor,m)
+			cadena = '/entrega-boletos/%s/%s/%s/%s' %(s,valor,m,usuario)
 			return HttpResponseRedirect(cadena)
 			
 	else:
@@ -332,7 +338,7 @@ def EntregaBoletos(request,s,b,m):
 		return render_to_response('entrega.html',{'formulario':formulario,'html':html,'d':d}, 
 				context_instance=RequestContext(request))
 
-def EntregaBoletos1(request,s,b):
+def EntregaBoletos1(request,s,b,usuario):
 
 	if Cuenta.objects.all().filter(Numero=s):
 		pass	
@@ -350,28 +356,21 @@ def EntregaBoletos1(request,s,b):
 			return HttpResponse('error <a href="/salir/">salir</a>')
 		if Hasta-Desde >= int(b):
 			return HttpResponse('te recordamos que solo deben ser %s Boletos <a href="/salir/">salir</a>' %b) 
-		
-		
-
-			#### dos filtros previos #### 
-			# 1 si el usuario tiene permiso sobre los numeros
-			# 2 si el boleto no esta marcado aun
-			
-			
-
-		
 		v = 0	
+		us = Funcionario.objects.get(Cod=usuario)
 		j = 0
 		for q in range(Desde,Hasta+1):
 
 				#log entrega alsocio
 			U = ' %s' %(datetime.date.today())
 				#Guardo los datos de entrega del socio
+			if not Boleto.objects.all().filter(Numero=q):
+				return HttpResponse('error un boleto ingresado no esta en el sistema <a href="/salir/">salir</a>')
 			ing = Boleto.objects.get(Numero=q)
 				
 			if ing.Entrega == False:
 				ing.Socio = socio
-
+				ing.Funcionario = us
 				ing.Fecha_e_s = datetime.date.today()
 				ing.Entrega = True
 				ing.save()
@@ -385,12 +384,12 @@ def EntregaBoletos1(request,s,b):
 
 		
 		if valor == 0: 
-			return HttpResponse('hola')
+			return HttpResponseRedirect('/salir/')
 			
 		else:
 
 			formulario = Boletosform()
-			cadena = '/entrega-boletos/%s/%s' %(s,valor)
+			cadena = '/entrega-boletos/%s/%s/%s' %(s,valor,socio)
 			return HttpResponseRedirect(cadena)
 			
 	else:
@@ -472,8 +471,13 @@ def econx(request,socio,usuario):
 	else:	
 		ing = Cuenta.objects.create(
 			Numero=socio)
+	if Funcionario.objects.all().filter(Cod=usuario):
+		pass	
+	else:	
+		ing1 = Funcionario.objects.create(
+			Cod=usuario)
 
-	return HttpResponseRedirect('/entrega-socio/%s/?usuario=%s' %(socio,usuario))
+	return HttpResponseRedirect('/entrega-socio/%s/%s' %(socio,usuario))
 
 def econxnegociacion(request,socio,usuario):
 	if Cuenta.objects.all().filter(Numero=socio):
@@ -487,6 +491,11 @@ def econxnegociacion(request,socio,usuario):
 	
 
 def Negocio(request,socio,usuario):
+	if Funcionario.objects.all().filter(Cod=usuario):
+		pass	
+	else:	
+		ing1 = Funcionario.objects.create(
+				Cod=usuario)
 	if request.method == 'POST':
 		if len(request.POST['razon'])==0 or len(request.POST['boletos'])==0:
 			formulario = Negociacion1()
@@ -503,17 +512,18 @@ def Negocio(request,socio,usuario):
 		else:
 			ing = Cuenta.objects.create(
 				Numero=socio)
+		
 
 		cuenta = Cuenta.objects.get(Numero=socio)
 
 		boletos = request.POST['boletos']
 		l = Historial.objects.create(Cuenta=cuenta,Monto=0,Boletos=boletos)
-		cadena = '/entrega-boletos/%s/%s/'%(cuenta,boletos)
+		cadena = '/entrega-boletos/%s/%s/%s'%(cuenta,boletos,usuario)
 		return HttpResponseRedirect(cadena)
 	else:
 		
 		formulario = Negociacion1()
 			
-		return render_to_response('entrega1.html',{'formulario':formulario}, 
+		return render_to_response('negocio.html',{'formulario':formulario}, 
 				context_instance=RequestContext(request))
 
