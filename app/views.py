@@ -65,20 +65,25 @@ def Entrega(request):
 			print request.POST['Usuario']
 			usuario = Funcionario.objects.get(Cod=request.POST['Usuario'])
 			for q in range(Desde,Hasta+1):
-			
+				print q
 			#log entrega al usuario
 			#print Boleto.objects.all().get(Numero=q)
-				if len(Boleto.objects.all().filter(Numero=q)) == 0:
-					print request.POST['Transferible']
+				if not Boleto.objects.all().filter(Numero=q):
 					
 					ing = Boleto.objects.create(
-							Numero=q,Funcionario=usuario,Fecha_e=datetime.date.today(),Entrega=False,Transferible=request.POST['Transferible'])
+							Numero=q,Funcionario=usuario,Fecha_e=datetime.date.today(),
+							Entrega=False,Transferible=request.POST['Transferible'])
 					
 				
 				else:
 					Valores = '%s | %s |' %(Valores,q)
 			if 	Valores != 'Valores: ':
-				Html = "<!DOCTYPE html><html><head><title>Ingreso</title><link type='text/css' rel='stylesheet' href='/static/css/base.css' /><link type='text/css' rel='stylesheet' href='/static/css/bootstrap.css' /></head><body><p>Se Dectectaron Errores en: %s</p> <br> <a href='/salir/' class='btn'>SALIR</a></body></html> " %(Valores)	
+				Html = """<!DOCTYPE html><html><head><title>Ingreso</title>
+				<link type='text/css' rel='stylesheet' href='/static/css/base.css' />
+				<link type='text/css' rel='stylesheet' href='/static/css/bootstrap.css' />
+				</head><body><p>Se Dectectaron Errores en: %s</p> <br> 
+				<a href='/salir/' class='btn'>SALIR</a>
+				</body></html> """ %(Valores)	
 				return HttpResponse(Html)	
 		else:
 			return HttpResponse('funciona')		
@@ -289,7 +294,9 @@ def EntregaBoletos(request,s,b,m,usuario):
 				ing.Funcionario = g
 				ing.save()
 				
-				return HttpResponseRedirect('/salir/')
+				html = """<h1>Se realizo con exito 
+						<a href="/salir/">Salir</a></h1>"""
+				return HttpResponse(html)
 			else:
 				formulario = Boletosform()
 				cadena = '/entrega-boletos/%s/1/%s' %(s,m)
@@ -323,7 +330,9 @@ def EntregaBoletos(request,s,b,m,usuario):
 
 		
 		if valor == 0: 
-			return HttpResponseRedirect('/salir/')
+			html = """<h1>Se realizo con exito 
+			<a href="/salir/">Salir</a></h1>"""
+			return HttpResponse(html)
 			
 		else:
 
@@ -353,7 +362,8 @@ def EntregaBoletos1(request,s,b,usuario):
 		u1 = request.POST['Hasta']
 		Hasta = int(u1)
 		if Desde>Hasta:
-			return HttpResponse('error <a href="/salir/">salir</a>')
+			return HttpResponse("""<p>Tenemos un Error por favor comunicar al Administrador  </p>
+				<a href="/salir/">salir</a>""")
 		if Hasta-Desde >= int(b):
 			return HttpResponse('te recordamos que solo deben ser %s Boletos <a href="/salir/">salir</a>' %b) 
 		v = 0	
@@ -526,4 +536,43 @@ def Negocio(request,socio,usuario):
 			
 		return render_to_response('negocio.html',{'formulario':formulario}, 
 				context_instance=RequestContext(request))
+############################################
+#####   Reporte  ####  Boleto ##############
+def Reporte_Boleto(request):
+	if request.method == 'POST':
+		if Boleto.objects.all().filter(Numero=request.POST['boleto']):
+			f = Boleto.objects.get(Numero=request.POST['boleto'])
+			return HttpResponse("""
+				<h1>Este Boleto ya fue entregado</h1>
+				<p># : %s <br> al socio: %s <br> por:  %s <br> fecha: %s</p>
+				<a href="/salir/">Salir</a>
+				"""%(f.Numero,f.Socio,f.Funcionario,f.Fecha_e_s)) 
+	else:
+		formulario = Boleto1()
+			
+		return render_to_response('reporte_boleto.html',{'formulario':formulario}, 
+				context_instance=RequestContext(request))
 
+#####   Reporte  ####  Socio ##############
+
+def Reporte_Funcionario(request):
+	if request.method == 'POST':
+		h = request.POST['funcionario']
+		if Funcionario.objects.all().filter(Users=h):
+			f = Funcionario.objects.all().filter(Users=request.POST['funcionario'])
+			g = len(f)
+			return HttpResponse("""
+				<h1>Reporte</h1>
+				<p>El usuario: %s <br> Entrego: %s Boletos</p>
+				<a href="/salir/">Salir</a>
+				"""%(request.POST['funcionario'],g)) 
+	else:
+		formulario = Funcionario1()
+			
+		return render_to_response('reporte_funcionario.html',{'formulario':formulario}, 
+				context_instance=RequestContext(request))
+	return HttpResponse(""" 
+
+
+
+		""")

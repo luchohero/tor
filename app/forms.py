@@ -29,3 +29,12 @@ class Negociacion1(forms.Form):
     boletos = forms.IntegerField()
     razon = forms.CharField(widget=forms.Textarea)
 
+class Boleto1(forms.Form):
+    boleto = forms.IntegerField()
+
+class Socio1(forms.Form):
+    socio = forms.IntegerField()
+
+class Funcionario1(forms.Form):
+    funcionario = forms.CharField()
+

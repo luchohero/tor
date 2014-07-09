@@ -36,7 +36,7 @@ class Cuenta_Admin(admin.ModelAdmin):
 class Boleto_Admin(admin.ModelAdmin):
 
 	list_display = 'Numero','Fecha','Socio','Funcionario','Fecha_e','Fecha_e_s','Entrega','Motivo','Baja','Transferible','Agencia'
-	list_filter = 'Funcionario',
+	list_filter = 'Funcionario','Socio','Entrega'
 	search_fields = ['Numero',]
 
 class Motivo_Admin(admin.ModelAdmin):
