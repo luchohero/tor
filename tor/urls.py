@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     #url(r'^econx-negociacion/(\d+)/(\s+)/$', 'app.views.econxnegociacion',),
     ###
     url(r'^negocio/$', 'app.views.Negocio',),
+    url(r'^cancelacion/(\d+)/(\d+)/$', 'app.views.Cancelacion'),
     url(r'^negocio1/(\d+)/(\d+)/$', 'app.views.Negocio',),
     # url(r'^blog/', include('blog.urls')),
     url(r'^entrega-boletos/(\d+)/(\d+)/(\d+)/(\d+)/$', 'app.views.EntregaBoletos'),

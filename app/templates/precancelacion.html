@@ -1,0 +1,43 @@
+
+<html>
+<head>
+  <title></title>
+  <link type="text/css" rel="stylesheet" href="/static/css/base.css" />
+  <link type="text/css" rel="stylesheet" href="/static/bootstrap/css/bootstrap.css" />
+
+</head>
+<style type="text/css">
+.cont-1{
+  width: 90%;
+  padding: 20px;
+  height: 100%;
+  background-color: white;
+  margin-left: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-size: 16px;
+}
+</style>
+<body>
+  <div class="cont-1">
+    <br>
+    {% autoescape off %}
+    {{html}}
+   
+<form method="post" action=".">{% csrf_token %}
+  
+{{texto}}
+<br>
+Cuotas {{formulario.Cuotas}} <br> 
+
+
+<br>
+<input type="submit" class="btn btn-primary" value="Enviar" >
+
+</form>
+
+ {% endautoescape %}
+
+</div>
+</body>
+</html>

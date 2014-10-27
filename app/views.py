@@ -258,6 +258,7 @@ def EntregaBoletos(request,s,b,m,usuario):
 	else:	
 		ing = Cuenta.objects.create(
 			Numero=s)
+
 	socio = Cuenta.objects.get(id=s)
 	
 	if request.method == 'POST':
@@ -553,6 +554,29 @@ def Reporte_Boleto(request):
 		return render_to_response('reporte_boleto.html',{'formulario':formulario}, 
 				context_instance=RequestContext(request))
 
+def Cancelacion(request,socio,usuario):
+	if Cuenta.objects.all().filter(Numero=socio):
+		pass	
+	else:	
+		ing = Cuenta.objects.create(
+			Numero=socio)
+
+	g = Cuenta.objects.get(Numero=socio)
+
+	if Funcionario.objects.all().filter(Cod=usuario):
+		pass	
+	else:	
+		ing1 = Funcionario.objects.create(
+			Cod=usuario)
+
+	formulario = FormCancelacion()
+	if request.method == 'POST':
+		h = request.POST['Cuotas']
+		return HttpResponseRedirect('/entrega-boletos/%s/%s/12/%s/' %(g.id,h,usuario))
+	else:
+		return render_to_response('precancelacion.html',{'formulario':formulario}, 
+			context_instance=RequestContext(request))
+
 #####   Reporte  ####  Socio ##############
 
 def Reporte_Funcionario(request):
@@ -572,7 +596,5 @@ def Reporte_Funcionario(request):
 		return render_to_response('reporte_funcionario.html',{'formulario':formulario}, 
 				context_instance=RequestContext(request))
 	return HttpResponse(""" 
-
-
 
 		""")
